@@ -1,13 +1,11 @@
-#!/usr/bin/env ruby
 #encoding: UTF-8
 require 'searcher/global'
 require 'core/nil'
 
 class Searcher::MultipleCrawler
-
   class Crawler
 
-    def initialize(user_agent=Global::UserAgent, redirect_limit=1)
+    def initialize(user_agent = Global::UserAgent, redirect_limit = 1)
       @user_agent = user_agent
       @redirect_limit = redirect_limit
       @timeout = 20
@@ -16,18 +14,16 @@ class Searcher::MultipleCrawler
     attr_accessor :user_agent, :redirect_limit, :timeout
 
     def fetch(website,selector='')
-        p "Pid:#{Process.pid}, fetch: #{website}\n"
-        res = Global.get_whole_response(website,@user_agent,@timeout)
-        html = Global.get_whole_html(res,@user_agent,@timeout)
-        doc = Nokogiri::HTML(html)
-        #doc.css(selector)  if selector != ''
+      p "Pid:#{Process.pid}, fetch: #{website}\n"
+      res = Global.get_whole_response(website,@user_agent,@timeout)
+      html = Global.get_whole_html(res,@user_agent,@timeout)
+      doc = Nokogiri::HTML(html)
+      #doc.css(selector)  if selector != ''
     end
 
   end
 
-
-
-  def initialize(websites, beanstalk_jobs=Global::Beanstalk_jobs, pm_max=10, user_agent=Global::UserAgent, redirect_limit=1)
+  def initialize(websites, beanstalk_jobs = Global::Beanstalk_jobs, pm_max = 10, user_agent = Global::UserAgent, redirect_limit = 1)
     @websites = websites                # the url we ready to crawl
     @beanstalk_jobs = beanstalk_jobs    # beanstalk host port and so on
     @pm_max = pm_max                    # max process number
@@ -36,12 +32,10 @@ class Searcher::MultipleCrawler
     @ipc_reader, @ipc_writer = IO.pipe
   end
 
-
   attr_accessor :user_agent, :redirect_limit
 
   def init_beanstalk_jobs
     beanstalk = Beanstalk::Pool.new(*@beanstalk_jobs)
-    #清空beanstalk的残留消息队列
     begin
       while job = beanstalk.reserve(0.1)
         job.delete
@@ -58,24 +52,12 @@ class Searcher::MultipleCrawler
 
 
   def process_jobs
-
     pm = Parallel::ForkManager.new(@pm_max)
 
-    #pm.run_on_start do |pid,ident|
-    #  print "** #{ident} started, pid: #{pid} and  size of results is #{results.size}\n"
-    #end
-    #
-    #pm.run_on_finish {
-    #    |pid,exit_code,ident|
-    #  print "** #{ident} just got out of the pool with PID #{pid} and exit code: #{exit_code} and  size of results is #{results.size}\n"
-    #}
-
     @pm_max.times do |i|
-
       pm.start(i) and next
       beanstalk = Beanstalk::Pool.new(*@beanstalk_jobs)
       @ipc_reader.close
-
       loop do
         begin
           job = beanstalk.reserve(0.1) # timeout 0.1s
@@ -108,7 +90,6 @@ class Searcher::MultipleCrawler
     end
     results
   end
-
 
   def run
     init_beanstalk_jobs
