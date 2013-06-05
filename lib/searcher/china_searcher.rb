@@ -57,13 +57,7 @@ class Searcher::ChinaSearcher
 
   class << self
     def  keyword_urls(names, keyword, page = PAGE_NUM)
-      urls = []
-      names.each do |name|
-        name.keyword_urls(keyword,page).each do |url|
-          urls << url
-        end
-      end
-      urls
+      names.inject([]) {|us, name| us << name.keyword_urls(keyword,page)}.flatten
     end
   end
 
