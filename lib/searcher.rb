@@ -6,29 +6,29 @@ class Searcher
   AllSearchers = UsSearchers + ChinaSearchers
   
   class << self
-    def get_links_from_searches(keywords,page=1,searchers=AllSearchers)
+    def get_links_from_searches(keywords, page = 1, searchers = AllSearchers)
       infos = []
       start_time = Time.now
       searchers.each do |searcher|
-       infos += send 'get_info_from_' + searcher,keywords,page
+       infos += send 'get_info_from_' + searcher, keywords, page
       end
       infos << (Time.now - start_time).round(4)
       infos
     end
 
     AllSearchers.each do |search|
-      define_method "get_info_from_#{search}" do |keywords,page=1|
+      define_method "get_info_from_#{search}" do |keywords, page = 1|
         if UsSearchers.include?(search)
-          send 'get_list_from_' + search,keywords,page
+          send 'get_list_from_' + search, keywords, page
         else
           searcher = send(search)
-          searcher.get_list(keywords,page)
+          searcher.get_list(keywords, page)
         end
       end
     end
 
-    def get_infos_from_url(url,selector='title')
-      crawler.fetch(url,selector)
+    def get_infos_from_url(url, selector = 'title')
+      crawler.fetch(url, selector)
     end
 
     def crawler
@@ -36,15 +36,15 @@ class Searcher
     end
 
     def baidu
-       @baidu =  ChinaSearcher.new('baidu', 'http://www.baidu.com/s?wd=','10')
+       @baidu =  ChinaSearcher.new('baidu', 'http://www.baidu.com/s?wd=', '10')
     end
 
     def sogou
-       @sogou =  ChinaSearcher.new('sogou', 'http://www.sogou.com/web?query=', '1','page')
+       @sogou =  ChinaSearcher.new('sogou', 'http://www.sogou.com/web?query=', '1', 'page')
     end
 
     def so360
-       @so360 = ChinaSearcher.new('so360','http://www.so.com/s?&q=')
+       @so360 = ChinaSearcher.new('so360', 'http://www.so.com/s?&q=')
     end
 
     def china_searchers
