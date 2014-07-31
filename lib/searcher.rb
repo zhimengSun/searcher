@@ -32,19 +32,19 @@ class Searcher
     end
 
     def crawler
-      @crawler = MultipleCrawler::Crawler.new
+      @crawler ||= MultipleCrawler::Crawler.new
     end
 
     def baidu
-       @baidu =  ChinaSearcher.new('baidu', 'http://www.baidu.com/s?wd=', '10')
+       @baidu ||=  ChinaSearcher.new('baidu', 'http://www.baidu.com/s?wd=', '10')
     end
 
     def sogou
-       @sogou =  ChinaSearcher.new('sogou', 'http://www.sogou.com/web?query=', '1', 'page')
+       @sogou ||=  ChinaSearcher.new('sogou', 'http://www.sogou.com/web?query=', '1', 'page')
     end
 
     def so360
-       @so360 = ChinaSearcher.new('so360', 'http://www.so.com/s?&q=')
+       @so360 ||= ChinaSearcher.new('so360', 'http://www.so.com/s?&q=')
     end
 
     def china_searchers
